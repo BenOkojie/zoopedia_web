@@ -39,7 +39,7 @@ export async function generateLeaderboard(userId: string) {
   const findUserRank = (
     list: { userId: string; score: number; rank: number }[],
   ): { rank: number | null; score: number | null } => {
-    const today = getTodayKey();
+  
     const userKey = userId;
     console.log('userKey:', userKey);
     const entry = list.find((e) => e.userId === userKey);

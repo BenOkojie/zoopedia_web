@@ -6,6 +6,7 @@ import stringSimilarity from 'string-similarity';
 import HintList from './hintList';
 import WinPage from './winPage';
 import LossPage from './lossPage';
+import { useSearchParams } from 'next/navigation';
 interface HintResponse {
   animal: string;
   hints: string[];
@@ -27,7 +28,8 @@ export default function Home() {
   const seconds = elapsedTime % 60;
   const rawMultiplier = 10 - Math.floor(elapsedTime / 120);
   const multiplier = rawMultiplier < 1 ? 1 : rawMultiplier;
-  const tempUserId = `user-22`;
+  const searchParams = useSearchParams();
+  const tempUserId = searchParams.get('user') ?? 'guest';
   const SIMILARITY_THRESHOLD = 0.85;
   const correctAnswer = animal;
   const baseScore = hints.length - answers.length + 1;
@@ -162,16 +164,6 @@ const [stateInitialized, setStateInitialized] = useState(false);
       setFeedback('Error submitting guess. Try again.');
     }
   };
-  
-  const handleReset = () => {
-    setAnswers([]);
-    setInput('');
-    setIsWin(false);
-    setStartTime(null);
-    setElapsedTime(0);
-    if (timerRef.current) clearInterval(timerRef.current);
-  };
-
 
 
   if (loading|| !stateInitialized) {

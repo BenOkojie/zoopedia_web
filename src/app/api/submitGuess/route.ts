@@ -27,6 +27,7 @@ const isWin = gameData.isWin === 'true';
             guesses = rawGuesses;
             } catch (err) {
             console.error('❌ Failed to parse guesses:', rawGuesses);
+            console.error('❌ Error:', err);
             // Self-heal if it's not an array
             }
     }

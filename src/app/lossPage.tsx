@@ -1,10 +1,9 @@
 interface LossPageProps {
     correctAnswer: string;
     
-    globalRank?: number | null;
     // onReset: () => void; // ❌ removed button use, but keep this if you still need it
   }
-export default function LossPage( {correctAnswer,globalRank}: LossPageProps) {
+export default function LossPage( {correctAnswer}: LossPageProps) {
     return (
       <div className="text-center space-y-4">
         <h2 className="text-2xl font-bold text-red-600">😢 You Lost!</h2>
