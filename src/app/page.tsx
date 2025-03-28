@@ -1,103 +1,272 @@
-import Image from "next/image";
-
+'use client';
+import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
+import stringSimilarity from 'string-similarity';
+import HintList from './hintList';
+import WinPage from './winPage';
+import LossPage from './lossPage';
+interface HintResponse {
+  animal: string;
+  hints: string[];
+}
 export default function Home() {
+  const [input, setInput] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [animal, setAnimal] = useState('');
+  const [hints, setHints] = useState<string[]>([]);
+  const [isWin, setIsWin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const visibleHints = hints.slice(0, answers.length);
+  const score = hints.length - answers.length + 1;
+  const minutes = Math.floor(elapsedTime / 60);
+  const seconds = elapsedTime % 60;
+  const rawMultiplier = 10 - Math.floor(elapsedTime / 120);
+  const multiplier = rawMultiplier < 1 ? 1 : rawMultiplier;
+  const tempUserId = `user-21`;
+  const SIMILARITY_THRESHOLD = 0.85;
+  const correctAnswer = animal;
+  const baseScore = hints.length - answers.length + 1;
+  const finalScore = Math.max(1, baseScore * multiplier);
+  const [isLoss, setIsLoss] = useState(false);
+  const [userDailyRank, setUserDailyRank] = useState<number | null>(null);
+const [userGlobalRank, setUserGlobalRank] = useState<number | null>(null);
+const [stateInitialized, setStateInitialized] = useState(false);
+
+
+  // const isLoss = !isWin && answers.length >= hints.length;
+
+  // Load game and start user session
+  useEffect(() => {
+    const fetchGameData = async () => {
+      console.log(tempUserId)
+      try {
+        const res = await fetch('/api/dailyGame');
+        const data: HintResponse = await res.json();
+        setAnimal(data.animal);
+        setHints(data.hints);
+
+        // Start user's game session
+        await fetch('/api/startGame', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: tempUserId }),
+        });
+        const userRes = await fetch('/api/getUserGame', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId:tempUserId }),
+        });
+        
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setIsWin(userData.isWin);
+          setAnswers(userData.guesses || []);
+          setIsLoss(userData.loss);
+          setElapsedTime(userData.timeTaken || 0);
+          setStateInitialized(true); // ✅ Now we're safe to render
+        
+      }
+
+        setLoading(false);
+      } catch (err) {
+        console.error('❌ Error initializing game:', err);
+      }
+    };
+
+    fetchGameData();
+  }, []);
+
+  useEffect(() => {
+    if (startTime && !isWin) {
+      timerRef.current = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [startTime, isWin]);
+
+  const handleSubmit = async () => {
+    if (input.trim() === '') return;
+  
+    const guess = input.trim().toLowerCase();
+  
+    const similarGuess = answers.find(
+      (prev) => stringSimilarity.compareTwoStrings(prev.toLowerCase(), guess) >= SIMILARITY_THRESHOLD
+    );
+  
+    if (similarGuess) {
+      setFeedback(`You've already guessed something like "${similarGuess}". Try something else!`);
+      return;
+    }
+  
+    try {
+      const res = await fetch('/api/submitGuess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: tempUserId,
+          guess,
+          hintCount: hints.length, }),
+      });
+  
+      const data = await res.json();
+  
+      if (data.message === 'Already guessed') {
+        setFeedback(`You already guessed "${guess}".`);
+        return;
+      }
+      console.log(data)
+      setAnswers(data.guesses);
+      setIsLoss(data.loss) // Update with backend-confirmed guesses
+      setInput('');
+      setFeedback('');
+  
+      // Start timer if first guess
+      if (data.guesses.length === 1 && !startTime) {
+        setStartTime(Date.now());
+      }
+  
+      // Check for win
+      if (guess === animal.toLowerCase()) {
+        setIsWin(true);
+        if (timerRef.current) clearInterval(timerRef.current);
+      
+      
+        await fetch('/api/win', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId:tempUserId, score: finalScore, timeTaken: elapsedTime }),
+        });
+        const leaderboardRes = await fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: tempUserId }),
+        });
+      
+        const leaderboardData = await leaderboardRes.json();
+        setUserDailyRank(leaderboardData.daily);
+        setUserGlobalRank(leaderboardData.global);
+        // const data = await res.json();
+        // setUserDailyRank(data.daily.rank);
+        // setUserGlobalRank(data.global.rank);
+      }
+    } catch (err) {
+      console.error('❌ Failed to submit guess:', err);
+      setFeedback('Error submitting guess. Try again.');
+    }
+  };
+  
+  const handleReset = () => {
+    setAnswers([]);
+    setInput('');
+    setIsWin(false);
+    setStartTime(null);
+    setElapsedTime(0);
+    if (timerRef.current) clearInterval(timerRef.current);
+  };
+
+
+
+  if (loading|| !stateInitialized) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-xl animate-pulse text-gray-500">Loading today’s challenge...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
+          className="mx-auto"
+          src="/logo.png"
+          alt="Game logo"
+          width={360}
+          height={400}
           priority
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {!isWin && startTime &&!isLoss&&(
+          <div className="text-center mb-4 text-sm text-gray-600">
+            Time: {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')} •
+            Multiplier: <span className="font-bold text-blue-600">{multiplier}x</span>
+          </div>
+        )}
+
+{isLoss ? (
+   <LossPage
+   correctAnswer={correctAnswer}
+ />
+ 
+
+) : isWin ? (
+  <WinPage
+  userId={tempUserId}
+  correctAnswer={correctAnswer}
+  guesses={answers}
+  score={score}
+  multiplier={multiplier}
+  time={`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`}
+  dailyRank={userDailyRank}
+  globalRank={userGlobalRank}
+/>
+
+) : (
+  <>
+    {/* Game UI */}
+    <div className="text-center text-sm text-gray-600">
+      Lives: {'❓'.repeat(hints.length - answers.length+1)}
+    </div>
+    
+    <div className="flex flex-1 gap-4">
+      {/* Left: Guess input */}
+      <div className="w-1/2 border rounded-lg p-4 h-64 overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-2">Your Guess</h2>
+        <div className="flex justify-between">
+          <textarea
+            className="w-full p-1 h-10 border rounded resize-none"
+            placeholder="Guess an animal"
+            value={input}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-500 p-2 h-10 hover:bg-blue-600"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <ArrowRightCircleIcon className="h-6 w-6 text-white" />
+          </button>
         </div>
+        {feedback && (
+          <p className="text-red-500 text-sm text-center mb-2">{feedback}</p>
+        )}
+        <ul className="space-y-1 p-1 text-center items-center">
+          {answers.map((answer, index) => (
+            <li key={index} className="bg-gray-100 rounded">{answer}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Right: Hints */}
+      <HintList hints={visibleHints} />
+    </div>
+  </>
+)}
+
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }

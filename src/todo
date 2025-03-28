@@ -1,0 +1,5 @@
+improve init random animal pool(low priority)
+add redis usage monitor screen
+compact old game data
+export used animal sets to json 
+rotate leaderboard hist
