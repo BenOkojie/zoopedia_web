@@ -30,7 +30,7 @@ export async function handleWin(userId: string, score: number, timeTaken:number)
   const userGameKey = `user:${userId}:game:${today}`;
   const dailyLBKey = `leaderboard:daily:${today}`;
   const globalLBKey = `leaderboard:global`;
-  await redis.zadd(globalLBKey, { score, member: userId });
+  await redis.zincrby(globalLBKey,  score, userId );
   await redis.zadd(dailyLBKey, { score, member: userId });
 
   await redis.hset(userGameKey, {

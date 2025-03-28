@@ -1,49 +1,4 @@
-// interface LeaderboardEntry {
-//     userId: string;
-//     score: number;
-//     rank: number;
-//   }
-  
-//   interface LeaderboardResult {
-//     leaderboard: LeaderboardEntry[];
-//     user: { rank: number; score: number } | null;
-//   }
-  
 
-//   export function generateLeaderboard(
-//     sortedList: (string | number)[],
-//     userIdToFind?: string
-//   ): LeaderboardResult {
-//     const leaderboard: LeaderboardEntry[] = [];
-//     let rank = 1;
-//     let prevScore: number | null = null;
-  
-//     for (let i = 0; i < sortedList.length; i += 2) {
-//       const id = sortedList[i] as string;
-//       const score = typeof sortedList[i + 1] === 'string'
-//         ? parseFloat(sortedList[i + 1] as string)
-//         : (sortedList[i + 1] as number);
-  
-//       // Check for tie in score
-//       if (prevScore !== null && score !== prevScore) {
-//         rank = leaderboard.length + 1;
-//       }
-  
-//       leaderboard.push({ userId: id, score, rank });
-//       prevScore = score;
-//     }
-  
-//     let user: { rank: number; score: number } | null = null;
-//     if (userIdToFind) {
-//       const entry = leaderboard.find((entry) => entry.userId === userIdToFind);
-//       if (entry) {
-//         user = { rank: entry.rank, score: entry.score };
-//       }
-//     }
-  
-//     return { leaderboard, user };
-//   }
-// src/utils/leaderboard.ts
 import { redis } from '@/lib/redis';
 
 const getTodayKey = () => new Date().toISOString().slice(0, 10);

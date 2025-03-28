@@ -27,7 +27,7 @@ export default function Home() {
   const seconds = elapsedTime % 60;
   const rawMultiplier = 10 - Math.floor(elapsedTime / 120);
   const multiplier = rawMultiplier < 1 ? 1 : rawMultiplier;
-  const tempUserId = `user-21`;
+  const tempUserId = `user-22`;
   const SIMILARITY_THRESHOLD = 0.85;
   const correctAnswer = animal;
   const baseScore = hints.length - answers.length + 1;
