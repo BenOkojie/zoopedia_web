@@ -1,5 +1,5 @@
 // hooks/useGameState.ts
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 interface GameState {
   isWin: boolean;

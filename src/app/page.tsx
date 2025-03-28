@@ -40,9 +40,6 @@ const [userGlobalRank, setUserGlobalRank] = useState<number | null>(null);
 const [stateInitialized, setStateInitialized] = useState(false);
 
 
-  // const isLoss = !isWin && answers.length >= hints.length;
-
-  // Load game and start user session
   useEffect(() => {
     const fetchGameData = async () => {
       console.log(tempUserId)

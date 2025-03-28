@@ -37,9 +37,9 @@ export async function pickRandomAnimal(): Promise<string> {
 export async function refillAnimalPool() {
   const used = await redis.smembers(ANIMALS_USED_KEY);
   if (used.length > 0) {
-    for (const _ of used) {
+    
         await redis.sadd(ANIMALS_POOL_KEY, used);
-    }
+    
     await redis.del(ANIMALS_USED_KEY);
     console.log(`🔁 Refilled pool with ${used.length} animals`);
   }
