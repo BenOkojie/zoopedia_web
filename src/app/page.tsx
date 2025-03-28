@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
+
 import stringSimilarity from 'string-similarity';
 import HintList from './hintList';
 import WinPage from './winPage';
