@@ -7,7 +7,6 @@ import stringSimilarity from 'string-similarity';
 import HintList from './hintList';
 import WinPage from './winPage';
 import LossPage from './lossPage';
-import { useSearchParams } from 'next/navigation';
 interface HintResponse {
   animal: string;
   hints: string[];
@@ -29,7 +28,7 @@ export default function  GameUI({ sessionId }: { sessionId: string }) {
   const seconds = elapsedTime % 60;
   const rawMultiplier = 10 - Math.floor(elapsedTime / 120);
   const multiplier = rawMultiplier < 1 ? 1 : rawMultiplier;
-  // const searchParams = useSearchParams();
+
   const tempUserId = sessionId;
   const SIMILARITY_THRESHOLD = 0.85;
   const correctAnswer = animal;
