@@ -12,7 +12,7 @@ interface HintResponse {
   animal: string;
   hints: string[];
 }
-export default function GameUI() {
+export default function  GameUI({ sessionId }: { sessionId: string }) {
   const [input, setInput] = useState('');
   const [feedback, setFeedback] = useState('');
   const [answers, setAnswers] = useState<string[]>([]);
@@ -29,8 +29,8 @@ export default function GameUI() {
   const seconds = elapsedTime % 60;
   const rawMultiplier = 10 - Math.floor(elapsedTime / 120);
   const multiplier = rawMultiplier < 1 ? 1 : rawMultiplier;
-  const searchParams = useSearchParams();
-  const tempUserId = searchParams.get('user') ?? 'guest';
+  // const searchParams = useSearchParams();
+  const tempUserId = sessionId;
   const SIMILARITY_THRESHOLD = 0.85;
   const correctAnswer = animal;
   const baseScore = hints.length - answers.length + 1;
