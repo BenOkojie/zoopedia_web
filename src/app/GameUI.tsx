@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
 
 import stringSimilarity from 'string-similarity';
-import HintList from './hintList';
 import WinPage from './winPage';
 import LossPage from './lossPage';
+import EmblaCarousel from './Carousel';
+import GuessCarousel from './GuessCarousel';
 interface HintResponse {
   animal: string;
   hints: string[];
@@ -152,9 +153,6 @@ const [stateInitialized, setStateInitialized] = useState(false);
         const leaderboardData = await leaderboardRes.json();
         setUserDailyRank(leaderboardData.daily);
         setUserGlobalRank(leaderboardData.global);
-        // const data = await res.json();
-        // setUserDailyRank(data.daily.rank);
-        // setUserGlobalRank(data.global.rank);
       }
     } catch (err) {
       console.error('❌ Failed to submit guess:', err);
@@ -211,17 +209,23 @@ const [stateInitialized, setStateInitialized] = useState(false);
 ) : (
   <>
     {/* Game UI */}
-    <div className="text-center text-sm text-gray-600">
-      Lives: {'❓'.repeat(hints.length - answers.length+1)}
+    <div className="flex w-full">
+    <div className="w-1/2">
+      <h2 className="text-2xl font-bold text-gray-800">Hints</h2>
     </div>
+    <div className="w-1/2 text-right">
+      <div className="text-2xl text-red-500">
+        {'❤️'.repeat(hints.length - answers.length + 1)}
+      </div>
+    </div>
+  </div>
+    <EmblaCarousel slides={visibleHints} /> 
+    <h2 className="text-2xl center font-semibold mb-2">Your Guess</h2>
+    <div className="flex flex-1 gap-4 w-full">
+
     
-    <div className="flex flex-1 gap-4">
-      {/* Left: Guess input */}
-      <div className="w-1/2 border rounded-lg p-4 h-64 overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-2">Your Guess</h2>
-        <div className="flex justify-between">
-          <textarea
-            className="w-full p-1 h-10 border rounded resize-none"
+    <textarea
+            className="w-full p-1 h-10 border rounded resize-none "
             placeholder="Guess an animal"
             value={input}
             onKeyDown={(e) => {
@@ -232,26 +236,19 @@ const [stateInitialized, setStateInitialized] = useState(false);
             }}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button
+            <button
             onClick={handleSubmit}
             className="bg-blue-500 p-2 h-10 hover:bg-blue-600"
           >
             <ArrowRightCircleIcon className="h-6 w-6 text-white" />
           </button>
-        </div>
-        {feedback && (
+          </div>
+          {feedback && (
           <p className="text-red-500 text-sm text-center mb-2">{feedback}</p>
         )}
-        <ul className="space-y-1 p-1 text-center items-center">
-          {answers.map((answer, index) => (
-            <li key={index} className="bg-gray-100 rounded">{answer}</li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Right: Hints */}
-      <HintList hints={visibleHints} />
-    </div>
+        <GuessCarousel slides={answers} /> 
+      
+  
   </>
 )}
 

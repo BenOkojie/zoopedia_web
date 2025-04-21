@@ -12,9 +12,13 @@
     "@google/generative-ai": "^0.24.0",
     "@heroicons/react": "^2.2.0",
     "@upstash/redis": "^1.34.6",
+    "embla-carousel": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "simple-keyboard": "^3.8.50",
+    "simple-keyboard-layouts": "^3.4.81",
     "string-similarity": "^4.0.4",
     "uuid": "^11.1.0"
   },
