@@ -170,7 +170,7 @@ const [stateInitialized, setStateInitialized] = useState(false);
   }
 
   return (
-    <div className="grid bg-white grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image
           className="mx-auto"
@@ -182,7 +182,7 @@ const [stateInitialized, setStateInitialized] = useState(false);
         />
 
         {!isWin && startTime &&!isLoss&&(
-          <div className="text-center mb-4 text-sm text-gray-600">
+          <div className="text-center mb-4 text-sm text-600">
             Time: {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')} •
             Multiplier: <span className="font-bold text-blue-600">{multiplier}x</span>
           </div>
@@ -211,7 +211,7 @@ const [stateInitialized, setStateInitialized] = useState(false);
     {/* Game UI */}
     <div className="flex w-full">
     <div className="w-1/2">
-      <h2 className="text-2xl font-bold text-gray-800">Hints</h2>
+      <h2 className="text-2xl font-bold text-800">Hints</h2>
     </div>
     <div className="w-1/2 text-right">
       <div className="text-2xl text-red-500">
