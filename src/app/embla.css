@@ -39,7 +39,7 @@
     justify-content: center;
     height: var(--slide-height);
     user-select: none;
-    border: 2px solid black;
+    border: 2px solid;
   }
   .embla__controls {
     display: grid;
@@ -59,7 +59,7 @@
     -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
     -webkit-appearance: none;
     appearance: none;
-    background-color: grey;
+    background-color: rgb(152, 160, 231);
     touch-action: manipulation;
     display: inline-flex;
     text-decoration: none;
@@ -85,6 +85,6 @@
   }
   .embla__dot--selected:after {
     /* box-shadow: inset 0 0 0 0.2rem var(--text-body); */
-    background-color: black;
+    background-color: rgb(40, 20, 216);
   }
   
