@@ -74,7 +74,7 @@ const [stateInitialized, setStateInitialized] = useState(false);
 
         setLoading(false);
       } catch (err) {
-        console.error('❌ Error initializing game:', err);
+        console.error('❌ Error initialiizing game:', err);
       }
     };
 
