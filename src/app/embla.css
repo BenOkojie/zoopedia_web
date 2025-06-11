@@ -1,5 +1,6 @@
 .embla {
-    max-width: 50rem;
+    max-width: 100%; 
+
     margin: 1;
     --slide-height: 19rem;
     --slide-spacing: 1rem;
@@ -7,7 +8,8 @@
     
   }
   .gembla {
-    max-width: 50rem;
+    
+    max-width: 100%; 
     margin: 1;
     --slide-height: 6rem;
     --slide-spacing: 1rem;
@@ -15,11 +17,13 @@
   }
   .embla__viewport {
     overflow: hidden;
+    max-width: 100%; 
   }
   .embla__container {
     display: flex;
     touch-action: pan-y pinch-zoom;
     margin-left: calc(var(--slide-spacing) * -1);
+    max-width: 100%; 
    
   }
   .embla__slide {
