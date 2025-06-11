@@ -25,10 +25,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     return (
       <section className="embla">
         <div className="embla__viewport" ref={emblaRef}>
-          <div className="embla__container flex items-center justify-center h-32 w-full sm:w-[500px] p-4 border rounded bg-gray-100 text-center overflow-hidden">
+          <div className="embla__container flex ">
             {slides.slice().reverse().map((item, index) => (
               <div className="embla__slide" key={index}>
-                <div className="embla__slide__number text-base sm:text-lg font-medium break-words truncate">{item}</div>
+                <div className="embla__slide__number">{item}</div>
               </div>
             ))} 
           </div>
