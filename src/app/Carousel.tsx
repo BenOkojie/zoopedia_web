@@ -28,7 +28,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
           <div className="embla__container flex ">
             {slides.slice().reverse().map((item, index) => (
               <div className="embla__slide" key={index}>
-                <div className="embla__slide__number text-base sm:text-lg font-medium break-words truncate">{item}</div>
+                <div className="embla__slide__number ">{item}</div>
               </div>
             ))} 
           </div>
