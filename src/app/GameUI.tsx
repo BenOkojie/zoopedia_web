@@ -215,7 +215,7 @@ const [stateInitialized, setStateInitialized] = useState(false);
     </div>
     <div className="w-1/2 text-right">
       <div className="text-2xl text-red-500">
-        {hints.length - answers.length + 1}{'❤️'}
+        {'❤️'.repeat(hints.length - answers.length + 1)}
       </div>
     </div>
   </div>
